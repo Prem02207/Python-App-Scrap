@@ -10,12 +10,16 @@
         .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.2); }
         .app-link { color: #00d4ff; text-decoration: none; }
         
-        /* Search Bar Desktop jaisa */
         .search-container { max-width: 600px; margin: 0 auto; }
-        
-        /* Table responsive setup */
         .table-responsive { overflow-x: auto; }
         th, td { font-size: 0.85rem; padding: 12px 10px !important; vertical-align: middle; white-space: nowrap; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            h2 { font-size: 1.1rem !important; white-space: nowrap !important; }
+            .scan-btn-text::after { content: "SCAN"; } /* Button text change */
+            .btn-text-full { display: none; } 
+        }
     </style>
 </head>
 <body>
@@ -26,7 +30,11 @@
             {% csrf_token %}
             <div class="input-group input-group-lg">
                 <input type="text" name="keyword" class="form-control" placeholder="Search app..." required value="{{ keyword|default:'' }}">
-                <button type="submit" class="btn btn-primary px-4">START SCAN</button>
+                <!-- Button mobile par sirf "SCAN" dikhayega -->
+                <button type="submit" class="btn btn-primary px-3">
+                    <span class="d-none d-md-inline">START SCAN</span>
+                    <span class="d-md-none">SCAN</span>
+                </button>
             </div>
         </form>
     </div>
