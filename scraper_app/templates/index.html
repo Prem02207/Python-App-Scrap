@@ -41,6 +41,14 @@
 
         .table-responsive { overflow-x: auto; }
         th, td { font-size: 0.85rem; padding: 12px 10px !important; vertical-align: middle; white-space: nowrap; }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            h2 { font-size: 1.2rem !important; white-space: nowrap !important; margin-bottom: 10px !important; }
+            .premium-card { padding: 15px !important; border-radius: 15px !important; }
+            .input-group input { height: 45px !important; font-size: 0.9rem !important; }
+            .input-group button { height: 45px !important; padding: 0 10px !important; }
+        }
     </style>
 </head>
 <body class="theme-midnight">
@@ -108,7 +116,6 @@
 </div>
 
 <script>
-    // Theme loading logic
     document.addEventListener("DOMContentLoaded", () => {
         const savedTheme = localStorage.getItem('selectedTheme') || 'theme-midnight';
         document.body.className = savedTheme;
