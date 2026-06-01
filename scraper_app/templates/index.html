@@ -6,23 +6,21 @@
     <title>Prem Yadav App Scanner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background: radial-gradient(circle at top right, #1a2a6c, #b21f1f, #fdbb2d); min-height: 100vh; color: #fff; padding: 20px; }
-        .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 25px; padding: 30px; border: 1px solid rgba(255,255,255,0.2); }
-        .app-link { color: #00d4ff; text-decoration: none; }
-        .app-link:hover { color: #fff; text-decoration: underline; }
-        .text-muted { color: #aaa !important; }
-        .table-dark { background-color: rgba(0,0,0,0.3) !important; font-size: 0.9rem; }
+        body { background: radial-gradient(circle at top right, #1a2a6c, #b21f1f, #fdbb2d); min-height: 100vh; color: #fff; padding: 10px; }
+        .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.2); }
+        .app-link { color: #00d4ff; text-decoration: none; word-break: break-all; }
+        .table-dark { background-color: rgba(0,0,0,0.4) !important; }
 
-        /* Mobile Specific Changes */
-        @media (max-width: 768px) {
-            .premium-card { padding: 15px; border-radius: 15px; }
-            h1 { font-size: 1.5rem; }
-            .input-group-lg { flex-direction: column; }
-            .input-group-lg input { border-radius: 10px !important; margin-bottom: 10px; width: 100%; }
-            .input-group-lg button { border-radius: 10px !important; width: 100%; margin-left: 0 !important; }
-            .table-dark { font-size: 0.7rem; }
-            th, td { padding: 6px 2px !important; }
+        /* FIX: Mobile responsive search form */
+        .search-box { display: flex; flex-direction: column; gap: 10px; }
+        @media (min-width: 576px) {
+            .search-box { flex-direction: row; }
+            .search-box input { flex: 1; }
         }
+
+        /* Table cleanup for mobile */
+        .table-responsive { border: none; }
+        th, td { font-size: 0.8rem; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -31,18 +29,17 @@
         <h1>Prem Yadav App Scanner</h1>
         <form method="POST" class="mt-4">
             {% csrf_token %}
-            <div class="input-group input-group-lg">
-                <input type="text" name="keyword" class="form-control"
-                       placeholder="Search app..." required
-                       value="{{ keyword|default:'' }}">
-                <button type="submit" class="btn btn-primary ms-2">START SCAN</button>
+            <div class="search-box">
+                <input type="text" name="keyword" class="form-control form-control-lg"
+                       placeholder="Search app..." required value="{{ keyword|default:'' }}">
+                <button type="submit" class="btn btn-primary btn-lg">START SCAN</button>
             </div>
         </form>
     </div>
 
     {% if results %}
     <div class="premium-card mt-4">
-        <h4 class="text-center mb-4">{{ results|length }} apps found for: "{{ keyword }}"</h4>
+        <h4 class="text-center mb-4">{{ results|length }} apps found</h4>
         <div class="table-responsive">
             <table class="table table-dark table-hover align-middle">
                 <thead>
@@ -50,26 +47,22 @@
                         <th>Title</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Website</th>
+                        <th>Web</th>
                         <th>Installs</th>
-                        <th>Score</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for app in results %}
                     <tr>
-                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">{{ app.title }}</a></td>
+                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">{{ app.title|slice:":10" }}..</a></td>
                         <td>{{ app.email|default:"N/A" }}</td>
                         <td>{{ app.phone|default:"N/A" }}</td>
                         <td>
                             {% if app.website and app.website != "N/A" %}
-                                <a href="https://{{ app.website }}" target="_blank" class="app-link">{{ app.website|slice:":15" }}...</a>
-                            {% else %}
-                                <span class="text-muted">N/A</span>
-                            {% endif %}
+                                <a href="https://{{ app.website }}" target="_blank" class="app-link">Visit</a>
+                            {% else %} - {% endif %}
                         </td>
                         <td>{{ app.installs }}</td>
-                        <td>{{ app.score }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -80,7 +73,7 @@
         </div>
     </div>
     {% elif request.method == "POST" %}
-    <div class="alert alert-warning mt-4 text-center">No apps found. Try a different keyword!</div>
+    <div class="alert alert-warning mt-4 text-center">No apps found.</div>
     {% endif %}
 </div>
 </body>
