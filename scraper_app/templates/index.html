@@ -10,13 +10,19 @@
         .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.2); }
         .app-link { color: #00d4ff; text-decoration: none; }
         
-        /* Table Layout Fix */
-        .table-dark { background-color: rgba(0,0,0,0.4) !important; }
-        .table-responsive { overflow-x: auto; }
-        th, td { white-space: nowrap; font-size: 0.9rem; padding: 12px 15px !important; }
-        
-        /* Compact Search Bar */
+        /* Professional Search Bar */
         .search-container { max-width: 600px; margin: 0 auto; }
+        
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            h2 { font-size: 1.4rem; white-space: nowrap; } /* Title ek line mein */
+            .input-group { flex-direction: column !important; }
+            .input-group input { width: 100% !important; border-radius: 10px !important; margin-bottom: 10px !important; }
+            .input-group button { width: 100% !important; border-radius: 10px !important; }
+        }
+
+        .table-dark { background-color: rgba(0,0,0,0.4) !important; }
+        th, td { font-size: 0.9rem; padding: 12px 15px !important; }
     </style>
 </head>
 <body>
