@@ -8,19 +8,19 @@
     <style>
         body { background: radial-gradient(circle at top right, #1a2a6c, #b21f1f, #fdbb2d); min-height: 100vh; color: #fff; padding: 20px; }
         .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.2); }
-        .app-link { color: #00d4ff; text-decoration: none; word-break: break-all; }
-        
-        .search-container { max-width: 600px; margin: 0 auto; }
-        
+        .app-link { color: #00d4ff; text-decoration: none; }
+
+        /* Desktop Table & Mobile Cards Switcher */
         @media (max-width: 768px) {
-            h2 { font-size: 1.2rem; white-space: nowrap; }
-            .input-group { flex-direction: column !important; }
-            .input-group input { width: 100% !important; border-radius: 10px !important; margin-bottom: 10px !important; }
-            .input-group button { width: 100% !important; border-radius: 10px !important; }
+            .desktop-view { display: none !important; }
+            .mobile-card-list { display: block !important; }
+        }
+        @media (min-width: 769px) {
+            .mobile-card-list { display: none !important; }
         }
 
-        .table-dark { background-color: rgba(0,0,0,0.5) !important; table-layout: auto; }
-        th, td { font-size: 0.85rem; padding: 12px 10px !important; vertical-align: middle; }
+        .mobile-card { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: left; border: 1px solid #444; }
+        .search-container { max-width: 600px; margin: 0 auto; }
     </style>
 </head>
 <body>
@@ -38,35 +38,36 @@
 
     {% if results %}
     <div class="premium-card mt-4">
-        <h5 class="text-center mb-3">{{ results|length }} apps found</h5>
-        <div class="table-responsive">
+        <!-- Desktop Table -->
+        <div class="table-responsive desktop-view">
             <table class="table table-dark table-hover">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Web</th>
-                        <th>Installs</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Title</th><th>Email</th><th>Phone</th><th>Web</th><th>Installs</th></tr></thead>
                 <tbody>
                     {% for app in results %}
                     <tr>
-                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">{{ app.title }}</a></td>
+                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" class="app-link">{{ app.title }}</a></td>
                         <td>{{ app.email }}</td>
                         <td>{{ app.phone|default:"N/A" }}</td>
-                        <td>
-                            {% if app.website and app.website != "N/A" %}
-                                <a href="https://{{ app.website }}" target="_blank" class="app-link" title="{{ app.website }}">{{ app.website }}</a>
-                            {% else %} - {% endif %}
-                        </td>
+                        <td>{% if app.website %}<a href="https://{{ app.website }}" class="app-link">Visit</a>{% else %}-{% endif %}</td>
                         <td>{{ app.installs }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <!-- Mobile Card List -->
+        <div class="mobile-card-list" style="display:none;">
+            {% for app in results %}
+            <div class="mobile-card">
+                <div class="fw-bold fs-5">{{ app.title }}</div>
+                <div class="text-secondary">Email: {{ app.email }}</div>
+                <div>Phone: {{ app.phone|default:"N/A" }} | Installs: {{ app.installs }}</div>
+                <a href="https://{{ app.website }}" class="app-link">Visit Website</a>
+            </div>
+            {% endfor %}
+        </div>
+        
         <div class="text-center mt-3">
             <a href="{% url 'download_excel' %}" class="btn btn-success">Download Excel</a>
         </div>
