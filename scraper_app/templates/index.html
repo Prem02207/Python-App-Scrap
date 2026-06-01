@@ -6,27 +6,57 @@
     <title>Prem Yadav App Scanner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background: radial-gradient(circle at top right, #1a2a6c, #b21f1f, #fdbb2d); min-height: 100vh; color: #fff; padding: 20px; }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            min-height: 100vh; color: #fff; padding: 20px; transition: 0.5s;
+        }
+
+        .theme-midnight { background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364); }
+        .theme-cyber { background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460); }
+        .theme-emerald { background: linear-gradient(-45deg, #134e5e, #71b280, #134e5e); }
+        .theme-crimson { background: linear-gradient(-45deg, #430e0e, #8c0000, #430e0e); }
+        .theme-aurora { background: linear-gradient(-45deg, #004e92, #000428, #004e92); }
+        .theme-gold { background: linear-gradient(-45deg, #283048, #859398, #283048); }
+
         .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.2); }
         .app-link { color: #00d4ff; text-decoration: none; }
-
         .search-container { max-width: 600px; margin: 0 auto; }
-        
-        /* SEARCH BAR FIX: Input bada, Button chhota */
+        .scope-text { font-size: 0.75rem; color: #ffeb3b; margin-top: 5px; margin-left: 5px; }
+
         .input-group { display: flex !important; flex-wrap: nowrap !important; }
         .input-group input { flex: 2 !important; }
-        .input-group button { flex: 1 !important; padding: 5px !important; font-size: 0.8rem !important; }
+        .input-group button {
+            flex: 1 !important;
+            padding: 8px !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+        }
 
         .table-responsive { overflow-x: auto; }
         th, td { font-size: 0.85rem; padding: 12px 10px !important; vertical-align: middle; white-space: nowrap; }
-
-        @media (max-width: 768px) {
-            h2 { font-size: 1.1rem !important; white-space: nowrap !important; }
-        }
     </style>
 </head>
-<body>
+<body class="theme-midnight">
+
 <div class="container">
+    <div class="text-end mb-3">
+        <select id="themeSelector" class="form-select w-auto d-inline-block bg-dark text-white border-0" onchange="changeTheme(this.value)">
+            <option value="theme-midnight">Theme: Midnight Sky</option>
+            <option value="theme-cyber">Theme: Cyber Space</option>
+            <option value="theme-emerald">Theme: Emerald Deep</option>
+            <option value="theme-crimson">Theme: Crimson Red</option>
+            <option value="theme-aurora">Theme: Aurora Blue</option>
+            <option value="theme-gold">Theme: Subtle Gold</option>
+        </select>
+    </div>
+
     <div class="premium-card text-center search-container">
         <h2 class="mb-4">Prem Yadav App Scanner</h2>
         <form method="POST">
@@ -35,6 +65,7 @@
                 <input type="text" name="keyword" class="form-control" placeholder="Search app..." required value="{{ keyword|default:'' }}">
                 <button type="submit" class="btn btn-primary">START SCAN</button>
             </div>
+            <div class="scope-text text-start">Search Scope: 500-5000 installs</div>
         </form>
     </div>
 
@@ -75,5 +106,19 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    // Theme loading logic
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem('selectedTheme') || 'theme-midnight';
+        document.body.className = savedTheme;
+        document.getElementById('themeSelector').value = savedTheme;
+    });
+
+    function changeTheme(themeName) {
+        document.body.className = themeName;
+        localStorage.setItem('selectedTheme', themeName);
+    }
+</script>
 </body>
 </html>
