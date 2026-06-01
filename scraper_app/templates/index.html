@@ -9,21 +9,14 @@
         body { background: radial-gradient(circle at top right, #1a2a6c, #b21f1f, #fdbb2d); min-height: 100vh; color: #fff; padding: 20px; }
         .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.2); }
         .app-link { color: #00d4ff; text-decoration: none; }
-        .table-dark { background-color: rgba(0,0,0,0.3) !important; }
 
-        /* Search Bar Desktop & Mobile */
-        .search-container { max-width: 700px; margin: 0 auto; }
-        .input-group-lg { gap: 10px; }
+        /* Table Layout Fix */
+        .table-dark { background-color: rgba(0,0,0,0.4) !important; }
+        .table-responsive { overflow-x: auto; }
+        th, td { white-space: nowrap; font-size: 0.9rem; padding: 12px 15px !important; }
 
-        /* Table responsive fix */
-        th, td { font-size: 0.85rem !important; }
-
-        @media (max-width: 576px) {
-            .search-bar-row { flex-direction: column; }
-            .btn-lg { width: 100%; }
-            /* Mobile par phone/installs hide kar rahe hain taaki slide na karna pade */
-            .hide-mobile { display: none; }
-        }
+        /* Compact Search Bar */
+        .search-container { max-width: 600px; margin: 0 auto; }
     </style>
 </head>
 <body>
@@ -32,10 +25,9 @@
         <h2 class="mb-4">Prem Yadav App Scanner</h2>
         <form method="POST">
             {% csrf_token %}
-            <div class="d-flex search-bar-row">
-                <input type="text" name="keyword" class="form-control form-control-lg me-sm-2"
-                       placeholder="Search app..." required value="{{ keyword|default:'' }}">
-                <button type="submit" class="btn btn-primary btn-lg mt-2 mt-sm-0">START SCAN</button>
+            <div class="input-group input-group-lg">
+                <input type="text" name="keyword" class="form-control" placeholder="Search app..." required value="{{ keyword|default:'' }}">
+                <button type="submit" class="btn btn-primary px-4">START SCAN</button>
             </div>
         </form>
     </div>
@@ -51,21 +43,21 @@
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Web</th>
-                        <th class="hide-mobile">Installs</th>
+                        <th>Installs</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for app in results %}
                     <tr>
-                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">{{ app.title|slice:":12" }}..</a></td>
-                        <td>{{ app.email|slice:":15" }}..</td>
+                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" class="app-link">{{ app.title }}</a></td>
+                        <td>{{ app.email }}</td>
                         <td>{{ app.phone|default:"N/A" }}</td>
                         <td>
                             {% if app.website and app.website != "N/A" %}
-                                <a href="https://{{ app.website }}" target="_blank" class="app-link">Visit</a>
+                                <a href="https://{{ app.website }}" class="app-link">{{ app.website|slice:":15" }}</a>
                             {% else %} - {% endif %}
                         </td>
-                        <td class="hide-mobile">{{ app.installs }}</td>
+                        <td>{{ app.installs }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -75,8 +67,6 @@
             <a href="{% url 'download_excel' %}" class="btn btn-success">Download Excel</a>
         </div>
     </div>
-    {% elif request.method == "POST" %}
-    <div class="alert alert-warning mt-4 text-center">No apps found.</div>
     {% endif %}
 </div>
 </body>
