@@ -10,26 +10,19 @@
         .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.2); }
         .app-link { color: #00d4ff; text-decoration: none; }
 
-        /* Mobile Card & Table Fixes */
-        .mobile-card { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #444; }
+        /* Search Bar Desktop jaisa */
+        .search-container { max-width: 600px; margin: 0 auto; }
 
-        /* Force single line text */
-        .force-nowrap { white-space: nowrap !important; }
-
-        @media (max-width: 768px) {
-            .desktop-view { display: none !important; }
-            .mobile-view { display: block !important; }
-        }
-        @media (min-width: 769px) {
-            .mobile-view { display: none !important; }
-        }
+        /* Table responsive setup */
+        .table-responsive { overflow-x: auto; }
+        th, td { font-size: 0.85rem; padding: 12px 10px !important; vertical-align: middle; white-space: nowrap; }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="premium-card text-center" style="max-width: 600px; margin: 0 auto;">
-        <h2>Prem Yadav App Scanner</h2>
-        <form method="POST" class="mt-3">
+    <div class="premium-card text-center search-container">
+        <h2 class="mb-4">Prem Yadav App Scanner</h2>
+        <form method="POST">
             {% csrf_token %}
             <div class="input-group input-group-lg">
                 <input type="text" name="keyword" class="form-control" placeholder="Search app..." required value="{{ keyword|default:'' }}">
@@ -40,40 +33,35 @@
 
     {% if results %}
     <div class="premium-card mt-4">
-        <!-- Desktop Table -->
-        <div class="table-responsive desktop-view">
+        <h5 class="text-center mb-3">{{ results|length }} apps found</h5>
+        <div class="table-responsive">
             <table class="table table-dark table-hover">
-                <thead><tr><th>App Name</th><th>Email</th><th>Phone</th><th>Web</th><th>Installs</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>App Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Web</th>
+                        <th>Installs</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {% for app in results %}
                     <tr>
-                        <td class="force-nowrap"><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" class="app-link">{{ app.title }}</a></td>
-                        <td class="force-nowrap">{{ app.email }}</td>
+                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">{{ app.title }}</a></td>
+                        <td>{{ app.email }}</td>
                         <td>{{ app.phone|default:"N/A" }}</td>
-                        <td>{% if app.website %}<a href="https://{{ app.website }}" class="app-link force-nowrap">Visit</a>{% else %}-{% endif %}</td>
+                        <td>
+                            {% if app.website and app.website != "N/A" %}
+                                <a href="https://{{ app.website }}" target="_blank" class="app-link">{{ app.website }}</a>
+                            {% else %} - {% endif %}
+                        </td>
                         <td>{{ app.installs }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-
-        <!-- Mobile View (Fixed) -->
-        <div class="mobile-view" style="display:none;">
-            {% for app in results %}
-            <div class="mobile-card">
-                <div class="d-flex justify-content-between">
-                    <span class="fw-bold force-nowrap">App Name:</span>
-                    <span class="force-nowrap"><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" class="app-link">{{ app.title }}</a></span>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span class="fw-bold">Web:</span>
-                    <span class="force-nowrap">{% if app.website %}<a href="https://{{ app.website }}" class="app-link">Visit Website</a>{% else %}-{% endif %}</span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
         <div class="text-center mt-3">
             <a href="{% url 'download_excel' %}" class="btn btn-success">Download Excel</a>
         </div>
