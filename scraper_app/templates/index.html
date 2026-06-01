@@ -11,20 +11,18 @@
         .app-link { color: #00d4ff; text-decoration: none; }
         .table-dark { background-color: rgba(0,0,0,0.3) !important; }
 
-        /* Search Bar Fix: Desktop par compact, Mobile par stack */
-        .search-container { max-width: 600px; margin: 0 auto; }
-        .input-wrapper { display: flex; gap: 10px; }
-        @media (max-width: 576px) {
-            .input-wrapper { flex-direction: column; }
-            .btn-lg { padding: 10px; }
-        }
+        /* Search Bar Desktop & Mobile */
+        .search-container { max-width: 700px; margin: 0 auto; }
+        .input-group-lg { gap: 10px; }
 
-        /* Table cleanup */
-        th, td { font-size: 0.85rem; padding: 12px 8px !important; }
-        .short-text { display: none; }
-        @media (max-width: 768px) {
-            .full-text { display: none; }
-            .short-text { display: inline; }
+        /* Table responsive fix */
+        th, td { font-size: 0.85rem !important; }
+
+        @media (max-width: 576px) {
+            .search-bar-row { flex-direction: column; }
+            .btn-lg { width: 100%; }
+            /* Mobile par phone/installs hide kar rahe hain taaki slide na karna pade */
+            .hide-mobile { display: none; }
         }
     </style>
 </head>
@@ -34,10 +32,10 @@
         <h2 class="mb-4">Prem Yadav App Scanner</h2>
         <form method="POST">
             {% csrf_token %}
-            <div class="input-wrapper">
-                <input type="text" name="keyword" class="form-control form-control-lg"
+            <div class="d-flex search-bar-row">
+                <input type="text" name="keyword" class="form-control form-control-lg me-sm-2"
                        placeholder="Search app..." required value="{{ keyword|default:'' }}">
-                <button type="submit" class="btn btn-primary btn-lg px-4">SCAN</button>
+                <button type="submit" class="btn btn-primary btn-lg mt-2 mt-sm-0">START SCAN</button>
             </div>
         </form>
     </div>
@@ -51,26 +49,23 @@
                     <tr>
                         <th>Title</th>
                         <th>Email</th>
+                        <th>Phone</th>
                         <th>Web</th>
-                        <th>Installs</th>
+                        <th class="hide-mobile">Installs</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for app in results %}
                     <tr>
-                        <td>
-                            <a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">
-                                <span class="full-text">{{ app.title }}</span>
-                                <span class="short-text">{{ app.title|slice:":8" }}..</span>
-                            </a>
-                        </td>
+                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">{{ app.title|slice:":12" }}..</a></td>
                         <td>{{ app.email|slice:":15" }}..</td>
+                        <td>{{ app.phone|default:"N/A" }}</td>
                         <td>
                             {% if app.website and app.website != "N/A" %}
                                 <a href="https://{{ app.website }}" target="_blank" class="app-link">Visit</a>
                             {% else %} - {% endif %}
                         </td>
-                        <td>{{ app.installs }}</td>
+                        <td class="hide-mobile">{{ app.installs }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
