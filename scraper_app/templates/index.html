@@ -11,10 +11,15 @@
         .app-link { color: #00d4ff; text-decoration: none; }
 
         .search-container { max-width: 600px; margin: 0 auto; }
+        
+        /* SEARCH BAR FIX: Input bada, Button chhota */
+        .input-group { display: flex !important; flex-wrap: nowrap !important; }
+        .input-group input { flex: 2 !important; }
+        .input-group button { flex: 1 !important; padding: 5px !important; font-size: 0.8rem !important; }
+
         .table-responsive { overflow-x: auto; }
         th, td { font-size: 0.85rem; padding: 12px 10px !important; vertical-align: middle; white-space: nowrap; }
 
-        /* Mobile Adjustments */
         @media (max-width: 768px) {
             h2 { font-size: 1.1rem !important; white-space: nowrap !important; }
         }
@@ -28,8 +33,7 @@
             {% csrf_token %}
             <div class="input-group input-group-lg">
                 <input type="text" name="keyword" class="form-control" placeholder="Search app..." required value="{{ keyword|default:'' }}">
-                <!-- Ab ye button har screen par START SCAN dikhayega -->
-                <button type="submit" class="btn btn-primary px-3">START SCAN</button>
+                <button type="submit" class="btn btn-primary">START SCAN</button>
             </div>
         </form>
     </div>
