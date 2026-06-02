@@ -6,45 +6,45 @@ import requests
 from bs4 import BeautifulSoup
 import io
 
-
 def search_apps(request):
     results = []
     keyword = ''
-    # Default values set ki hain
-    min_installs = 500
-    max_installs = 5000
+    min_installs = 100
+    max_installs = 10000000
 
     if request.method == "POST":
         keyword = request.POST.get('keyword', '').strip()
-        # Input se values li hain
-        min_installs = int(request.POST.get('min_installs', 500))
-        max_installs = int(request.POST.get('max_installs', 5000))
+        try:
+            min_installs = int(request.POST.get('min_installs', 100))
+            max_installs = int(request.POST.get('max_installs', 10000000))
+        except (ValueError, TypeError):
+            pass
 
         if keyword:
             try:
-                # n_hits 10 se badhakar 30 kar di hai taaki filter hone par bhi results milein
-                apps = search(keyword, lang="en", country="in", n_hits=30)
+                # n_hits ko 20 rakhein taaki jaldi response mile aur timeout na ho
+                apps = search(keyword, lang="en", country="in", n_hits=20)
 
                 for app in apps:
-                    installs_str = app.get('installs', '0').replace(',', '').replace('+', '')
+                    # String manipulation ko safe banaya
+                    installs_str = str(app.get('installs', '0')).replace(',', '').replace('+', '')
                     installs_count = int(installs_str) if installs_str.isdigit() else 0
 
-                    # Dynamic Range Filter
                     if min_installs <= installs_count <= max_installs:
-                        url = f"https://play.google.com/store/apps/details?id={app['appId']}"
+                        # Sirf simple string/int values ka dictionary
                         data_row = {
-                            'title': app.get('title'),
-                            'appId': app['appId'],
-                            'installs': app.get('installs'),
-                            'score': app.get('score', 0),
+                            'title': str(app.get('title', 'N/A')),
+                            'appId': str(app.get('appId', 'N/A')),
+                            'installs': str(app.get('installs', '0')),
+                            'score': str(app.get('score', 0)),
                             'email': 'N/A',
-                            'website': 'N/A',
-                            'phone': 'N/A'
+                            'website': 'N/A'
                         }
 
                         try:
                             headers = {'User-Agent': 'Mozilla/5.0'}
-                            resp = requests.get(url, headers=headers, timeout=5)
+                            url = f"https://play.google.com/store/apps/details?id={data_row['appId']}"
+                            resp = requests.get(url, headers=headers, timeout=3) # Timeout 3 sec kiya
                             if resp.status_code == 200:
                                 soup = BeautifulSoup(resp.content, 'html.parser')
                                 email_tag = soup.find('a', href=lambda x: x and x.startswith('mailto:'))
@@ -53,11 +53,11 @@ def search_apps(request):
                                 web_tag = soup.find('a', {'aria-label': lambda x: x and 'website' in x.lower()})
                                 if web_tag and web_tag.has_attr('href'):
                                     data_row['website'] = web_tag['href'].split('//')[-1].split('/')[0]
-                        except Exception:
+                        except:
                             pass
                         results.append(data_row)
 
-                # Session mein save kiya taki download button kaam kare
+                # Results ko session mein save karein
                 request.session['search_data'] = results
 
             except Exception as e:
@@ -70,11 +70,10 @@ def search_apps(request):
         'max_installs': max_installs
     })
 
-
 def download_excel(request):
     data = request.session.get('search_data')
     if not data:
-        return HttpResponse("No data to download.")
+        return HttpResponse("No data available to download.")
 
     df = pd.DataFrame(data)
     output = io.BytesIO()
