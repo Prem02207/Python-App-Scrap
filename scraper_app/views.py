@@ -10,22 +10,28 @@ import io
 def search_apps(request):
     results = []
     keyword = ''
+    # Default values set ki hain
+    min_installs = 500
+    max_installs = 5000
 
     if request.method == "POST":
         keyword = request.POST.get('keyword', '').strip()
+        # Input se values li hain
+        min_installs = int(request.POST.get('min_installs', 500))
+        max_installs = int(request.POST.get('max_installs', 5000))
+
         if keyword:
             try:
-                # 1. Scraping Search Results
-                apps = search(keyword, lang="en", country="in", n_hits=10)
+                # n_hits 10 se badhakar 30 kar di hai taaki filter hone par bhi results milein
+                apps = search(keyword, lang="en", country="in", n_hits=30)
 
                 for app in apps:
                     installs_str = app.get('installs', '0').replace(',', '').replace('+', '')
                     installs_count = int(installs_str) if installs_str.isdigit() else 0
 
-                    if 500 <= installs_count <= 5000:
+                    # Dynamic Range Filter
+                    if min_installs <= installs_count <= max_installs:
                         url = f"https://play.google.com/store/apps/details?id={app['appId']}"
-
-                        # Default values
                         data_row = {
                             'title': app.get('title'),
                             'appId': app['appId'],
@@ -36,46 +42,44 @@ def search_apps(request):
                             'phone': 'N/A'
                         }
 
-                        # 2. Scraping Details with better error handling
                         try:
                             headers = {'User-Agent': 'Mozilla/5.0'}
-                            resp = requests.get(url, headers=headers, timeout=8)  # Timeout badhaya
+                            resp = requests.get(url, headers=headers, timeout=5)
                             if resp.status_code == 200:
                                 soup = BeautifulSoup(resp.content, 'html.parser')
-
-                                # Email
                                 email_tag = soup.find('a', href=lambda x: x and x.startswith('mailto:'))
                                 if email_tag:
                                     data_row['email'] = email_tag['href'].replace('mailto:', '').split('?')[0]
-
-                                # Website
                                 web_tag = soup.find('a', {'aria-label': lambda x: x and 'website' in x.lower()})
                                 if web_tag and web_tag.has_attr('href'):
                                     data_row['website'] = web_tag['href'].split('//')[-1].split('/')[0]
                         except Exception:
                             pass
-
                         results.append(data_row)
+
+                # Session mein save kiya taki download button kaam kare
+                request.session['search_data'] = results
 
             except Exception as e:
                 print(f"Scraping Error: {e}")
 
-    # Results ko session mein nahi, direct context mein bhejein
-    return render(request, 'index.html', {'results': results, 'keyword': keyword})
+    return render(request, 'index.html', {
+        'results': results,
+        'keyword': keyword,
+        'min_installs': min_installs,
+        'max_installs': max_installs
+    })
 
 
 def download_excel(request):
-    # Ab data ko session se nahi, yahan logic se handle karna hoga
-    # Yahan simple trick: Agar session use nahi karna, toh download ke liye
-    # naya request bhejna hoga. Filhal hum basic session rakhenge par limit karenge.
     data = request.session.get('search_data')
+    if not data:
+        return HttpResponse("No data to download.")
 
-    # ... baki code wahi rahega ...
     df = pd.DataFrame(data)
     output = io.BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, index=False)
-    writer.close()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False)
     output.seek(0)
 
     response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
