@@ -1,7 +1,10 @@
-django
-gunicorn
-requests
-beautifulsoup4
-google-play-scraper
-pandas
-openpyxl
+asgiref==3.8.1
+beautifulsoup4==4.12.3
+Django==5.2.14
+google-play-scraper==1.2.7
+gunicorn==22.0.0
+openpyxl==3.1.5
+pandas==2.2.2
+requests==2.32.3
+whitenoise==6.7.0
+xlsxwriter==3.2.0
