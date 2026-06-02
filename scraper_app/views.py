@@ -17,21 +17,19 @@ def search_apps(request):
         try:
             min_installs = int(request.POST.get('min_installs', 100))
             max_installs = int(request.POST.get('max_installs', 10000000))
-        except (ValueError, TypeError):
+        except:
             pass
 
         if keyword:
             try:
-                # n_hits ko 20 rakhein taaki jaldi response mile aur timeout na ho
-                apps = search(keyword, lang="en", country="in", n_hits=20)
+                # n_hits 10 rakhein taaki server par load kam ho
+                apps = search(keyword, lang="en", country="in", n_hits=10)
 
                 for app in apps:
-                    # String manipulation ko safe banaya
                     installs_str = str(app.get('installs', '0')).replace(',', '').replace('+', '')
                     installs_count = int(installs_str) if installs_str.isdigit() else 0
 
                     if min_installs <= installs_count <= max_installs:
-                        # Sirf simple string/int values ka dictionary
                         data_row = {
                             'title': str(app.get('title', 'N/A')),
                             'appId': str(app.get('appId', 'N/A')),
@@ -41,10 +39,10 @@ def search_apps(request):
                             'website': 'N/A'
                         }
 
+                        # Scraping sirf tabhi karein jab zaroori ho
                         try:
-                            headers = {'User-Agent': 'Mozilla/5.0'}
                             url = f"https://play.google.com/store/apps/details?id={data_row['appId']}"
-                            resp = requests.get(url, headers=headers, timeout=3) # Timeout 3 sec kiya
+                            resp = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=3)
                             if resp.status_code == 200:
                                 soup = BeautifulSoup(resp.content, 'html.parser')
                                 email_tag = soup.find('a', href=lambda x: x and x.startswith('mailto:'))
@@ -57,30 +55,21 @@ def search_apps(request):
                             pass
                         results.append(data_row)
 
-                # Results ko session mein save karein
                 request.session['search_data'] = results
 
             except Exception as e:
-                print(f"Scraping Error: {e}")
+                print(f"Error: {e}")
 
-    return render(request, 'index.html', {
-        'results': results,
-        'keyword': keyword,
-        'min_installs': min_installs,
-        'max_installs': max_installs
-    })
+    return render(request, 'index.html', {'results': results, 'keyword': keyword, 'min_installs': min_installs, 'max_installs': max_installs})
 
 def download_excel(request):
     data = request.session.get('search_data')
-    if not data:
-        return HttpResponse("No data available to download.")
-
+    if not data: return HttpResponse("No data")
     df = pd.DataFrame(data)
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False)
     output.seek(0)
-
     response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename="apps.xlsx"'
     return response
