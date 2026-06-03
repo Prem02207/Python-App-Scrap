@@ -12,10 +12,11 @@
         .app-link { color: #58a6ff; text-decoration: none; }
         .footer { margin-top: auto; padding: 20px; text-align: center; opacity: 0.6; font-size: 0.8rem; }
 
-        /* Responsive Logic: Mobile par stack, Desktop par side-by-side */
+        /* Responsive Fix: Mobile par search bar full width aur button niche */
         @media (max-width: 576px) {
-            .search-container { flex-direction: column; gap: 10px; }
-            .search-container .btn { width: 100%; border-radius: 8px !important; }
+            .search-container { flex-direction: column !important; }
+            .search-container .form-control { border-radius: 8px !important; margin-bottom: 10px; }
+            .search-container .btn { width: 100%; border-radius: 8px !important; margin-left: 0 !important; }
         }
 
         /* 6 Professional Gradients */
@@ -45,7 +46,7 @@
         <h2 class="text-center mb-4">Scriza App Scanner</h2>
         <form id="scanForm" method="POST">
             {% csrf_token %}
-            <div class="input-group input-group-lg search-container mb-3">
+            <div class="input-group input-group-lg d-flex search-container mb-3">
                 <input type="text" name="keyword" class="form-control bg-dark text-white border-secondary" placeholder="Search..." required value="{{ keyword|default:'' }}">
                 <button type="submit" id="scanBtn" class="btn btn-primary px-4">
                     <span id="btnText">START SCAN</span>
