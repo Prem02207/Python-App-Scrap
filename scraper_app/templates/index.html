@@ -12,14 +12,17 @@
         .app-link { color: #58a6ff; text-decoration: none; }
         .footer { margin-top: auto; padding: 20px; text-align: center; opacity: 0.6; font-size: 0.8rem; }
 
-        /* Responsive Fix: Mobile par search bar full width aur button niche */
+        /* Button & Layout Fixes */
+        .search-container { display: flex; gap: 10px; }
+        #scanBtn { min-width: 120px; display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.3s; }
+
         @media (max-width: 576px) {
             .search-container { flex-direction: column !important; }
-            .search-container .form-control { border-radius: 8px !important; margin-bottom: 10px; }
-            .search-container .btn { width: 100%; border-radius: 8px !important; margin-left: 0 !important; }
+            .search-container .form-control { width: 100% !important; height: 50px !important; }
+            .search-container .btn { width: 100% !important; margin-left: 0 !important; height: 50px !important; }
         }
 
-        /* 6 Professional Gradients */
+        /* Themes */
         .theme-midnight { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
         .theme-cyber    { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); }
         .theme-aurora   { background: linear-gradient(135deg, #004e92, #000428, #004e92); }
@@ -46,15 +49,15 @@
         <h2 class="text-center mb-4">Scriza App Scanner</h2>
         <form id="scanForm" method="POST">
             {% csrf_token %}
-            <div class="input-group input-group-lg d-flex search-container mb-3">
-                <input type="text" name="keyword" class="form-control bg-dark text-white border-secondary" placeholder="Search..." required value="{{ keyword|default:'' }}">
+            <div class="search-container mb-3">
+                <input type="text" name="keyword" class="form-control form-control-lg bg-dark text-white border-secondary" placeholder="Search..." required value="{{ keyword|default:'' }}">
                 <button type="submit" id="scanBtn" class="btn btn-primary px-4">
-                    <span id="btnText">START SCAN</span>
-                    <span id="spinner" class="spinner-border spinner-border-sm d-none ms-2"></span>
+                    <span id="btnText">SCAN</span>
+                    <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
                 </button>
             </div>
 
-            <div class="row g-3">
+            <div class="row g-3 mt-2">
                 <div class="col-6">
                     <label class="text-secondary small">Min Installs</label>
                     <input type="number" name="min_installs" value="{{ min_installs|default:'100' }}" class="input-box">
@@ -103,11 +106,9 @@
 
     const scanForm = document.getElementById('scanForm');
     const scanBtn = document.getElementById('scanBtn');
-    const btnText = document.getElementById('btnText');
     const spinner = document.getElementById('spinner');
 
     scanForm.addEventListener('submit', function() {
-        btnText.innerText = "Scanning...";
         spinner.classList.remove('d-none');
         scanBtn.style.pointerEvents = "none";
         scanBtn.style.opacity = "0.7";
