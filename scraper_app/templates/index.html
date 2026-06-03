@@ -6,79 +6,52 @@
     <title>Scriza App Scanner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        body { background-color: #0d1117; color: #fff; min-height: 100vh; display: flex; flex-direction: column; transition: 0.5s; font-family: sans-serif; }
+        .premium-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; }
+        .input-box { background: #161b22; border: 1px solid #30363d; color: white; padding: 8px; border-radius: 8px; width: 100%; }
+        .app-link { color: #58a6ff; text-decoration: none; }
+        .footer { margin-top: auto; padding: 20px; text-align: center; opacity: 0.6; font-size: 0.8rem; }
 
-        body {
-            background-size: 400% 400%;
-            animation: gradientAnimation 15s ease infinite;
-            min-height: 100vh; color: #fff; padding: 20px; transition: 0.5s;
-            display: flex; flex-direction: column;
-        }
-
-        .theme-midnight { background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364); }
-        .theme-cyber { background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460); }
-        .theme-emerald { background: linear-gradient(-45deg, #134e5e, #71b280, #134e5e); }
-        .theme-crimson { background: linear-gradient(-45deg, #430e0e, #8c0000, #430e0e); }
-        .theme-aurora { background: linear-gradient(-45deg, #004e92, #000428, #004e92); }
-        .theme-gold { background: linear-gradient(-45deg, #283048, #859398, #283048); }
-
-        .premium-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.2); }
-        .app-link { color: #00d4ff; text-decoration: none; }
-        .search-container { max-width: 600px; margin: 0 auto; }
-
-        .input-group { display: flex !important; flex-wrap: nowrap !important; }
-        .input-group input { flex: 2 !important; }
-        .input-group button { flex: 1 !important; padding: 8px !important; font-size: 0.95rem !important; font-weight: 600 !important; }
-
-        .slider-container { position: relative; height: 30px; margin-top: 10px; }
-        .form-range { position: absolute; width: 100%; pointer-events: none; appearance: none; background: none; }
-        .form-range::-webkit-slider-thumb { pointer-events: auto; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #00d4ff; cursor: pointer; border: 2px solid #fff; }
-        .range-label { font-size: 0.85rem; color: #ffeb3b; font-weight: bold; display: block; margin-top: 10px; }
-
-        .footer { margin-top: auto; padding: 20px; text-align: center; font-size: 0.8rem; opacity: 0.7; }
-
-        .table-responsive { overflow-x: auto; }
-        th, td { font-size: 0.85rem; padding: 12px 10px !important; vertical-align: middle; white-space: nowrap; }
-
-        @media (max-width: 768px) {
-            h2 { font-size: 1.2rem !important; margin-bottom: 10px !important; }
-            .premium-card { padding: 15px !important; border-radius: 15px !important; }
-        }
+        /* 6 Professional Mixed Gradients */
+        .theme-midnight { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
+        .theme-cyber    { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); }
+        .theme-aurora   { background: linear-gradient(135deg, #004e92, #000428, #004e92); }
+        .theme-emerald  { background: linear-gradient(135deg, #114357, #8e9eab, #114357); }
+        .theme-crimson  { background: linear-gradient(135deg, #2c0000, #5c0000, #2c0000); }
+        .theme-gold     { background: linear-gradient(135deg, #1e1e1e, #3a3a3a, #1e1e1e); }
     </style>
 </head>
 <body class="theme-midnight">
 
-<div class="container">
-    <div class="text-end mb-3">
-        <select id="themeSelector" class="form-select w-auto d-inline-block bg-dark text-white border-0" onchange="changeTheme(this.value)">
-            <option value="theme-midnight">Theme: Midnight Sky</option>
-            <option value="theme-cyber">Theme: Cyber Space</option>
-            <option value="theme-emerald">Theme: Emerald Deep</option>
-            <option value="theme-crimson">Theme: Crimson Red</option>
-            <option value="theme-aurora">Theme: Aurora Blue</option>
-            <option value="theme-gold">Theme: Subtle Gold</option>
+<div class="container py-4">
+    <div class="d-flex justify-content-end mb-3">
+        <select id="themeSelector" class="form-select w-auto bg-dark text-white border-0" onchange="changeTheme(this.value)">
+            <option value="theme-midnight">Midnight Sky</option>
+            <option value="theme-cyber">Cyber Space</option>
+            <option value="theme-aurora">Aurora Blue</option>
+            <option value="theme-emerald">Emerald Deep</option>
+            <option value="theme-crimson">Crimson Prof.</option>
+            <option value="theme-gold">Tech Charcoal</option>
         </select>
     </div>
 
-    <div class="premium-card text-center search-container">
-        <!-- Naam change kiya -->
-        <h2 class="mb-4">Scriza App Scanner</h2>
+    <div class="premium-card mx-auto" style="max-width: 700px;">
+        <h2 class="text-center mb-4">Scriza App Scanner</h2>
         <form method="POST">
             {% csrf_token %}
             <div class="input-group input-group-lg mb-3">
-                <input type="text" name="keyword" class="form-control" placeholder="Search..." required value="{{ keyword|default:'' }}">
-                <button type="submit" class="btn btn-primary">START SCAN</button>
+                <input type="text" name="keyword" class="form-control bg-dark text-white border-secondary" placeholder="Search..." required value="{{ keyword|default:'' }}">
+                <button type="submit" class="btn btn-primary px-4">START SCAN</button>
             </div>
 
-            <div class="text-start">
-                <label class="range-label">Installs Range: <span id="rangeValue">{{ min_installs|default:'100' }} - {{ max_installs|default:'10000000' }}</span></label>
-                <div class="slider-container">
-                    <input type="range" name="min_installs" id="minRange" min="100" max="10000000" step="100000" value="{{ min_installs|default:'100' }}" class="form-range" oninput="updateRange()">
-                    <input type="range" name="max_installs" id="maxRange" min="100" max="10000000" step="100000" value="{{ max_installs|default:'10000000' }}" class="form-range" oninput="updateRange()">
+            <div class="row g-3">
+                <div class="col-6">
+                    <label class="text-secondary small">Min Installs</label>
+                    <input type="number" name="min_installs" value="{{ min_installs|default:'100' }}" class="input-box">
+                </div>
+                <div class="col-6">
+                    <label class="text-secondary small">Max Installs</label>
+                    <input type="number" name="max_installs" value="{{ max_installs|default:'10000000' }}" class="input-box">
                 </div>
             </div>
         </form>
@@ -88,17 +61,15 @@
     <div class="premium-card mt-4">
         <h5 class="text-center mb-3">{{ results|length }} apps found</h5>
         <div class="table-responsive">
-            <table class="table table-dark table-hover">
-                <thead>
-                    <tr><th>App Name</th><th>Email</th><th>Phone</th><th>Website</th><th>Installs</th></tr>
-                </thead>
+            <table class="table table-dark table-hover align-middle">
+                <thead><tr><th>App Name</th><th>Email</th><th>Phone</th><th>Website</th><th>Installs</th></tr></thead>
                 <tbody>
                     {% for app in results %}
                     <tr>
                         <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">{{ app.title }}</a></td>
                         <td>{{ app.email }}</td>
                         <td>{{ app.phone|default:"N/A" }}</td>
-                        <td>{% if app.website and app.website != "N/A" %}<a href="https://{{ app.website }}" target="_blank" class="app-link">{{ app.website }}</a>{% else %} - {% endif %}</td>
+                        <td>{% if app.website %}<a href="https://{{ app.website }}" target="_blank" class="app-link">{{ app.website }}</a>{% else %} N/A {% endif %}</td>
                         <td>{{ app.installs }}</td>
                     </tr>
                     {% endfor %}
@@ -106,35 +77,26 @@
             </table>
         </div>
         <div class="text-center mt-3">
-            <a href="{% url 'download_excel' %}" class="btn btn-success">Download Excel</a>
+            <a href="{% url 'download_excel' %}" class="btn btn-success px-4">Download Excel</a>
         </div>
     </div>
     {% endif %}
 </div>
 
-<!-- Powered by Footer add kiya -->
 <footer class="footer">
     Powered by Prem Yadav
 </footer>
 
 <script>
-    function updateRange() {
-        let min = parseInt(document.getElementById('minRange').value);
-        let max = parseInt(document.getElementById('maxRange').value);
-        if (min > max) { let temp = min; min = max; max = temp; }
-        document.getElementById('rangeValue').innerText = `${min.toLocaleString()} - ${max.toLocaleString()}`;
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        const savedTheme = localStorage.getItem('selectedTheme') || 'theme-midnight';
-        document.body.className = savedTheme;
-        document.getElementById('themeSelector').value = savedTheme;
-    });
-
     function changeTheme(themeName) {
         document.body.className = themeName;
         localStorage.setItem('selectedTheme', themeName);
     }
+    window.onload = () => {
+        const saved = localStorage.getItem('selectedTheme') || 'theme-midnight';
+        document.body.className = saved;
+        document.getElementById('themeSelector').value = saved;
+    };
 </script>
 </body>
 </html>
