@@ -2,69 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scriza App Scanner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { color: #fff; min-height: 100vh; display: flex; flex-direction: column; transition: 0.5s; font-family: sans-serif; }
-        .premium-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; }
-        .input-box { background: #161b22; border: 1px solid #30363d; color: white; padding: 8px; border-radius: 8px; width: 100%; }
-        .app-link { color: #58a6ff; text-decoration: none; }
-        .footer { margin-top: auto; padding: 20px; text-align: center; opacity: 0.6; font-size: 0.8rem; }
+        body { color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; font-family: 'Segoe UI', sans-serif; transition: 0.5s; }
+        .premium-card { background: rgba(20, 25, 35, 0.85); border: 1px solid #30363d; border-radius: 20px; padding: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .input-box { background: #161b22; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 8px; width: 100%; height: 45px; }
 
-        /* Button & Layout Fixes */
-        .search-container { display: flex; gap: 10px; }
-        #scanBtn { min-width: 120px; display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.3s; }
+        .app-link { text-decoration: none; color: inherit; display: flex; align-items: center; }
+        .app-link:hover { color: #58a6ff; }
 
-        @media (max-width: 576px) {
-            .search-container { flex-direction: column !important; }
-            .search-container .form-control { width: 100% !important; height: 50px !important; }
-            .search-container .btn { width: 100% !important; margin-left: 0 !important; height: 50px !important; }
-        }
+        .btn-scan { height: 45px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
 
         /* Themes */
         .theme-midnight { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
-        .theme-cyber    { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); }
-        .theme-aurora   { background: linear-gradient(135deg, #004e92, #000428, #004e92); }
-        .theme-emerald  { background: linear-gradient(135deg, #114357, #8e9eab, #114357); }
-        .theme-crimson  { background: linear-gradient(135deg, #2c0000, #5c0000, #2c0000); }
-        .theme-gold     { background: linear-gradient(135deg, #1e1e1e, #3a3a3a, #1e1e1e); }
+        .theme-space { background: linear-gradient(135deg, #000000, #434343); }
+        .theme-ocean { background: linear-gradient(135deg, #134e5e, #71b280); }
+        .theme-royal { background: linear-gradient(135deg, #283048, #859398); }
+        .theme-sunset { background: linear-gradient(135deg, #403b4a, #e7e9bb); }
+        .theme-forest { background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); }
+        .theme-matrix { background: #000000; }
+        .theme-slate { background: linear-gradient(135deg, #2c3e50, #4ca1af); }
+
+        .table { border-collapse: collapse !important; background: transparent !important; }
+        .table td, .table th { border: none !important; padding: 15px 10px !important; vertical-align: middle !important; }
+        .footer { margin-top: auto; padding: 20px; text-align: center; color: #58a6ff; font-weight: bold; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .scanning-active { animation: pulse 1.5s infinite; cursor: wait !important; }
     </style>
 </head>
 <body class="theme-midnight">
 
 <div class="container py-4 flex-grow-1">
     <div class="d-flex justify-content-end mb-3">
-        <select id="themeSelector" class="form-select w-auto bg-dark text-white border-0" onchange="changeTheme(this.value)">
-            <option value="theme-midnight">Midnight Sky</option>
-            <option value="theme-cyber">Cyber Space</option>
-            <option value="theme-aurora">Aurora Blue</option>
-            <option value="theme-emerald">Emerald Deep</option>
-            <option value="theme-crimson">Crimson Prof.</option>
-            <option value="theme-gold">Tech Charcoal</option>
+        <select id="themeSelect" class="form-select w-auto bg-dark text-white border-0">
+            <option value="theme-midnight">Midnight</option><option value="theme-space">Deep Space</option>
+            <option value="theme-ocean">Ocean Breeze</option><option value="theme-royal">Royal Slate</option>
+            <option value="theme-sunset">Sunset Glow</option><option value="theme-forest">Forest Fire</option>
+            <option value="theme-matrix">Matrix Black</option><option value="theme-slate">Steel Slate</option>
         </select>
     </div>
 
-    <div class="premium-card mx-auto" style="max-width: 700px;">
+    <div class="premium-card mx-auto" style="max-width: 900px;">
         <h2 class="text-center mb-4">Scriza App Scanner</h2>
         <form id="scanForm" method="POST">
             {% csrf_token %}
-            <div class="search-container mb-3">
-                <input type="text" name="keyword" class="form-control form-control-lg bg-dark text-white border-secondary" placeholder="Search..." required value="{{ keyword|default:'' }}">
-                <button type="submit" id="scanBtn" class="btn btn-primary px-4">
-                    <span id="btnText">SCAN</span>
-                    <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
-                </button>
-            </div>
+            <div class="row g-3">
+                <div class="col-md-10"><input type="text" name="keyword" class="form-control form-control-lg bg-dark text-white border-secondary" placeholder="Enter keyword..." required value="{{ keyword|default:'' }}"></div>
+                <div class="col-md-2"><button type="submit" id="scanBtn" class="btn btn-primary w-100 btn-scan">SCAN</button></div>
 
-            <div class="row g-3 mt-2">
-                <div class="col-6">
-                    <label class="text-secondary small">Min Installs</label>
-                    <input type="number" name="min_installs" value="{{ min_installs|default:'100' }}" class="input-box">
+                <div class="col-md-2"><label class="small text-secondary">Min Install</label><input type="number" name="min_installs" value="{{ min_installs }}" class="input-box"></div>
+                <div class="col-md-2"><label class="small text-secondary">Max Install</label><input type="number" name="max_installs" value="{{ max_installs }}" class="input-box"></div>
+
+                <div class="col-md-3"><label class="small text-secondary">Industry</label>
+                    <select name="category" class="input-box">
+                        <option value="All" {% if selected_cat == 'All' %}selected{% endif %}>All</option>
+                        {% for val, name in categories %}<option value="{{ val }}" {% if selected_cat == val %}selected{% endif %}>{{ name }}</option>{% endfor %}
+                    </select>
                 </div>
-                <div class="col-6">
-                    <label class="text-secondary small">Max Installs</label>
-                    <input type="number" name="max_installs" value="{{ max_installs|default:'10000000' }}" class="input-box">
+                <div class="col-md-2"><label class="small text-secondary">Country</label>
+                    <select name="country" class="input-box">{% for val, name in countries %}<option value="{{ val }}" {% if selected_country == val %}selected{% endif %}>{{ name }}</option>{% endfor %}</select>
+                </div>
+                <div class="col-md-3"><label class="small text-secondary">Year</label>
+                    <select name="year" class="input-box">
+                        <option value="All" {% if selected_year == 'All' %}selected{% endif %}>All</option>
+                        {% for y in years %}<option value="{{ y }}" {% if selected_year|stringformat:"s" == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>{% endfor %}
+                    </select>
                 </div>
             </div>
         </form>
@@ -72,53 +75,59 @@
 
     {% if results %}
     <div class="premium-card mt-4">
-        <h5 class="text-center mb-3">{{ results|length }} apps found</h5>
+        <h5 class="text-primary mb-3">Found: {{ results|length }} Apps</h5>
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
-                <thead><tr><th>App Name</th><th>Email</th><th>Phone</th><th>Website</th><th>Installs</th></tr></thead>
+            <table class="table table-dark table-hover">
+                <thead><tr><th>App Name</th><th>Email</th><th>Phone</th><th>Website</th><th>Year</th><th>Installs</th></tr></thead>
                 <tbody>
                     {% for app in results %}
                     <tr>
-                        <td><a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">{{ app.title }}</a></td>
-                        <td>{{ app.email }}</td>
-                        <td>{{ app.phone|default:"N/A" }}</td>
-                        <td>{% if app.website %}<a href="https://{{ app.website }}" target="_blank" class="app-link">{{ app.website }}</a>{% else %} N/A {% endif %}</td>
-                        <td>{{ app.installs }}</td>
+                        <td>
+                            <a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">
+                                <img src="{{ app.icon }}" style="width:25px; height:25px; border-radius:4px; margin-right:10px;"> {{ app.title }}
+                            </a>
+                        </td>
+                        <td class="text-warning">{{ app.email }}</td>
+                        <td class="text-success">{{ app.phone }}</td>
+                        <td><a href="{{ app.website }}" target="_blank" class="text-info text-decoration-underline">{{ app.website }}</a></td>
+                        <td class="text-info">{{ app.year }}</td>
+                        <td class="text-light fw-bold">{{ app.installs }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        <div class="text-center mt-3">
-            <a href="{% url 'download_excel' %}" class="btn btn-success px-4">Download Excel</a>
-        </div>
+        <div class="text-center mt-3"><a href="{% url 'download_excel' %}" class="btn btn-primary px-5">Download Excel</a></div>
     </div>
     {% endif %}
 </div>
-
-<footer class="footer">Powered by Prem Yadav</footer>
+<footer class="footer"><small>Designed by Prem Yadav</small></footer>
 
 <script>
-    function changeTheme(themeName) {
-        document.body.className = themeName;
-        localStorage.setItem('selectedTheme', themeName);
-    }
-
-    const scanForm = document.getElementById('scanForm');
-    const scanBtn = document.getElementById('scanBtn');
-    const spinner = document.getElementById('spinner');
-
-    scanForm.addEventListener('submit', function() {
-        spinner.classList.remove('d-none');
-        scanBtn.style.pointerEvents = "none";
-        scanBtn.style.opacity = "0.7";
+    // 1. Scan animation
+    document.getElementById('scanForm').addEventListener('submit', function() {
+        const btn = document.getElementById('scanBtn');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" style="margin-right:8px;"></span> Scanning...';
+        btn.classList.add('scanning-active');
+        btn.disabled = true;
     });
 
-    window.onload = () => {
-        const saved = localStorage.getItem('selectedTheme') || 'theme-midnight';
-        document.body.className = saved;
-        document.getElementById('themeSelector').value = saved;
-    };
+    // 2. Theme Persistence (Local Storage)
+    const body = document.body;
+    const themeSelect = document.getElementById('themeSelect');
+
+    // Page load hote hi check karein
+    const savedTheme = localStorage.getItem('selectedTheme');
+    if (savedTheme) {
+        body.className = savedTheme;
+        themeSelect.value = savedTheme;
+    }
+
+    // Theme change hone par save karein
+    themeSelect.addEventListener('change', function() {
+        body.className = this.value;
+        localStorage.setItem('selectedTheme', this.value);
+    });
 </script>
 </body>
 </html>
