@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Scriza App Scanner</title>
     <script>
-        // Page load hote hi turant theme set karein
         (function() {
             const savedTheme = localStorage.getItem('selectedTheme') || 'theme-ocean';
             document.documentElement.className = savedTheme;
@@ -12,7 +11,6 @@
     </script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Footer fix ke liye CSS changes */
         html, body { height: 100%; margin: 0; }
         body {
             background: inherit !important;
@@ -25,6 +23,20 @@
 
         .container { flex: 1 0 auto; padding-top: 2rem; padding-bottom: 2rem; }
         .footer { flex-shrink: 0; padding: 20px; text-align: center; color: #58a6ff; font-weight: bold; }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .not-found-container { animation: fadeIn 0.8s ease-in-out; }
+        .emoji-animate { display: inline-block; animation: shake 2s infinite ease-in-out; font-size: 3rem; }
 
         /* Themes */
         .theme-midnight { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
@@ -67,11 +79,12 @@
                 <div class="col-md-2"><button type="submit" id="scanBtn" class="btn btn-primary w-100 btn-scan">SCAN</button></div>
 
                 <div class="col-md-2"><label class="small text-secondary">Min Install</label>
-                    <input type="number" name="min_installs" value="{{ min_installs|default:'1' }}" class="input-box"
-                           oninput="if(this.value>9999999) this.value=9999999; if(this.value<0) this.value=0;"></div>
-                <div class="col-md-2"><label class="small text-secondary">Max Install</label>
-                    <input type="number" name="max_installs" value="{{ max_installs|default:'10000000' }}" class="input-box"
-                           oninput="if(this.value>10000000) this.value=10000000; if(this.value<1) this.value=1;"></div>
+                    <input type="number" name="min_installs" value="{{ min_installs|default:'1' }}" class="input-box" oninput="if(this.value>999999999) this.value=999999999; if(this.value<0) this.value=0;"></div>
+
+                <div class="col-md-2">
+                    <label class="small text-secondary">Max Install</label>
+                    <input type="number" name="max_installs" value="{{ max_installs|default:'1000000000' }}" class="input-box" oninput="if(this.value>1000000000) this.value=1000000000; if(this.value<1) this.value=1;">
+                </div>
 
                 <div class="col-md-3"><label class="small text-secondary">Industry</label>
                     <select name="category" class="input-box">
@@ -92,32 +105,40 @@
         </form>
     </div>
 
-    {% if results %}
-    <div class="premium-card mt-4">
-        <h5 class="text-primary mb-3">Found: {{ results|length }} Apps</h5>
-        <div class="table-responsive">
-            <table class="table table-dark table-hover">
-                <thead><tr><th>App Name</th><th>Email</th><th>Phone</th><th>Website</th><th>Year</th><th>Installs</th></tr></thead>
-                <tbody>
-                    {% for app in results %}
-                    <tr>
-                        <td>
-                            <a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">
-                                <img src="{{ app.icon }}" style="width:25px; height:25px; border-radius:4px; margin-right:10px;"> {{ app.title }}
-                            </a>
-                        </td>
-                        <td class="text-warning">{{ app.email }}</td>
-                        <td class="text-success">{{ app.phone }}</td>
-                        <td><a href="{{ app.website }}" target="_blank" class="text-info text-decoration-underline">{{ app.website }}</a></td>
-                        <td class="text-info">{{ app.year }}</td>
-                        <td class="text-light fw-bold">{{ app.installs }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="text-center mt-3"><a href="{% url 'download_excel' %}" class="btn btn-primary px-5">Download Excel</a></div>
-    </div>
+    {% if results is not None %}
+        {% if results|length > 0 %}
+            <div class="premium-card mt-4">
+                <h5 class="text-primary mb-3">Found: {{ results|length }} Apps</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead><tr><th>App Name</th><th>Email</th><th>Phone</th><th>Website</th><th>Year</th><th>Installs</th></tr></thead>
+                        <tbody>
+                            {% for app in results %}
+                            <tr>
+                                <td>
+                                    <a href="https://play.google.com/store/apps/details?id={{ app.appId }}" target="_blank" class="app-link">
+                                        <img src="{{ app.icon }}" style="width:25px; height:25px; border-radius:4px; margin-right:10px;"> {{ app.title }}
+                                    </a>
+                                </td>
+                                <td class="text-warning">{{ app.email }}</td>
+                                <td class="text-success">{{ app.phone }}</td>
+                                <td><a href="{{ app.website }}" target="_blank" class="text-info text-decoration-underline">{{ app.website }}</a></td>
+                                <td class="text-info">{{ app.year }}</td>
+                                <td class="text-light fw-bold">{{ app.installs }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3"><a href="{% url 'download_excel' %}" class="btn btn-primary px-5">Download Excel</a></div>
+            </div>
+        {% else %}
+            <div class="premium-card mt-4 text-center not-found-container">
+                <div class="emoji-animate">😔</div>
+                <h4 class="text-danger mt-2">Result Not Found</h4>
+                <p class="text-secondary">Sorry, no apps matched your criteria. <br> Try changing your filters or searching a different keyword.</p>
+            </div>
+        {% endif %}
     {% endif %}
 </div>
 
@@ -127,12 +148,10 @@
     const themeSelect = document.getElementById('themeSelect');
     const currentTheme = localStorage.getItem('selectedTheme') || 'theme-ocean';
     themeSelect.value = currentTheme;
-
     themeSelect.addEventListener('change', function() {
         document.documentElement.className = this.value;
         localStorage.setItem('selectedTheme', this.value);
     });
-
     document.getElementById('scanForm').addEventListener('submit', function() {
         const btn = document.getElementById('scanBtn');
         btn.innerHTML = '<span class="spinner-border spinner-border-sm" style="margin-right:8px;"></span> Scanning...';

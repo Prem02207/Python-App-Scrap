@@ -25,12 +25,14 @@ CATEGORIES = [
 
 @csrf_exempt
 def search_apps(request):
-    results = []
+    # results ko None rakhein taki initial load par kuch display na ho
+    results = None
     keyword, selected_country, selected_cat, selected_year = '', 'all', 'All', 'All'
-    min_installs, max_installs = '1', '10000000'
+    min_installs, max_installs = '1', '1000000000'
     years = list(range(2028, 1999, -1))
 
     if request.method == "POST":
+        results = [] # Search button click hote hi results ko list bana dein
         keyword = request.POST.get('keyword', '').strip()
         selected_country = request.POST.get('country', 'all')
         selected_cat = request.POST.get('category', 'All')
